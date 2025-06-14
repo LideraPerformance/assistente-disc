@@ -1,0 +1,45 @@
+/* Definindo as cores do DISC como variáveis CSS */
+:root {
+    --color-d: #ef4444; /* Vermelho */
+    --color-i: #f59e0b; /* Amarelo/Âmbar */
+    --color-s: #10b981; /* Verde */
+    --color-c: #3b82f6; /* Azul */
+}
+
+/* Estilo base com fundo azul claro e suave */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f0f9ff;
+}
+
+/* Estilo de cartão padrão */
+.card {
+    background-color: #ffffff;
+    border-radius: 1.5rem;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07);
+    padding: 2rem;
+}
+
+/* Animação do spinner */
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border-left-color: #3b82f6;
+    animation: spin 1s ease infinite;
+}
+.spinner-small { width: 24px; height: 24px; }
+
+/* Estilos customizados para os sliders */
+input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 8px; border-radius: 5px; background: #e5e7eb; outline: none; transition: opacity .2s; }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 4px solid #fff; box-shadow: 0 0 5px rgba(0,0,0,0.2); transition: transform .2s ease; }
+input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.1); }
+
+/* Aplicando as cores do DISC a cada slider */
+#d-slider::-webkit-slider-thumb { background: var(--color-d); }
+#i-slider::-webkit-slider-thumb { background: var(--color-i); }
+#s-slider::-webkit-slider-thumb { background: var(--color-s); }
+#c-slider::-webkit-slider-thumb { background: var(--color-c); }

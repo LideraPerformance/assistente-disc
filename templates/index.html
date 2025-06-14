@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analisador DISC - Lidera Assessments</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="text-gray-800">
+
+    <div class="container mx-auto max-w-3xl px-4 py-8 md:py-12">
+        
+        <header class="text-center mb-12">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-slate-800">Lidera Assessments®</h1>
+            <p class="text-base md:text-lg text-slate-600 mt-2">Análise Interativa de Perfil DISC</p>
+        </header>
+
+        <div class="card mb-12">
+             <div class="space-y-6">
+                <div class="flex items-start gap-4">
+                    <div class="flex-shrink-0 h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                        <svg class="h-6 w-6 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                           <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z" />
+                           <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-700">O que a avaliação mede?</h3>
+                        <p class="text-sm text-slate-600 mt-1">Uma avaliação DISC mede como nos comportamos e comunicamos. Ela revela suas preferências comportamentais com base nas pontuações que você fornecer.</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-4">
+                     <div class="flex-shrink-0 h-12 w-12 rounded-full bg-yellow-100 flex items-center justify-center">
+                        <svg class="h-6 w-6 text-yellow-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                           <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-700">A importância dos dados</h3>
+                        <p class="text-sm text-slate-600 mt-1">Lembre-se: ter informações erradas é pior do que não ter informações. Dados precisos são essenciais para uma análise útil e confiável.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-8">
+            <h2 class="text-xl md:text-2xl font-bold mb-8 text-center text-slate-700">Insira suas Pontuações</h2>
+            <form id="disc-form" class="space-y-8">
+                <!-- Inputs serão renderizados aqui, idênticos ao protótipo -->
+                 <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <label for="d-slider" class="font-bold text-lg" style="color: var(--color-d);">Dominância (D)</label>
+                        <span id="d-value" class="font-bold text-lg px-3 py-1 rounded-full text-white" style="background-color: var(--color-d);">5.0</span>
+                    </div>
+                    <input type="range" id="d-slider" min="0" max="10" step="0.1" value="5">
+                </div>
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <label for="i-slider" class="font-bold text-lg" style="color: var(--color-i);">Influência (I)</label>
+                        <span id="i-value" class="font-bold text-lg px-3 py-1 rounded-full text-white" style="background-color: var(--color-i);">5.0</span>
+                    </div>
+                    <input type="range" id="i-slider" min="0" max="10" step="0.1" value="5">
+                </div>
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <label for="s-slider" class="font-bold text-lg" style="color: var(--color-s);">Estabilidade (S)</label>
+                        <span id="s-value" class="font-bold text-lg px-3 py-1 rounded-full text-white" style="background-color: var(--color-s);">5.0</span>
+                    </div>
+                    <input type="range" id="s-slider" min="0" max="10" step="0.1" value="5">
+                </div>
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <label for="c-slider" class="font-bold text-lg" style="color: var(--color-c);">Conformidade (C)</label>
+                        <span id="c-value" class="font-bold text-lg px-3 py-1 rounded-full text-white" style="background-color: var(--color-c);">5.0</span>
+                    </div>
+                    <input type="range" id="c-slider" min="0" max="10" step="0.1" value="5">
+                </div>
+                <div class="pt-6 text-center">
+                    <button type="submit" id="submit-button" class="bg-blue-600 text-white font-bold py-3 w-full md:w-auto md:px-12 rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all text-lg shadow-lg hover:shadow-xl">
+                        Gerar Análise
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div id="results-section" class="hidden space-y-8">
+            <div id="loading" class="hidden flex-col items-center justify-center p-8">
+                <div class="spinner mb-4"></div>
+                <p class="text-slate-600 font-semibold">Analisando seu perfil...</p>
+            </div>
+            <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl" role="alert"></div>
+            <div id="analysis-output" class="space-y-8"></div>
+            <div id="interactive-section" class="hidden space-y-6">
+                <!-- Seção interativa será renderizada aqui -->
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

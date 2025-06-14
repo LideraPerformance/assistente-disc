@@ -1,0 +1,103 @@
+import os
+from flask import Flask, render_template, request, jsonify
+from dotenv import load_dotenv
+import google.generativeai as genai
+
+# Carrega as variáveis de ambiente do arquivo .env
+load_dotenv()
+
+# --- Configuração do Flask e da API ---
+app = Flask(__name__, template_folder='../templates', static_folder='../static')
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+genai.configure(api_key=GEMINI_API_KEY)
+
+# --- Constante com o Prompt Base ---
+PROMPT_BASE = """
+Persona: Você é o 'Assistente Lidera Assessments®', um especialista virtual na metodologia DISC. Sua comunicação é sempre sugestiva e condicional (use "tende a", "pode indicar", "sugere"), nunca afirmativa. Você é um guia para o autoconhecimento.
+Base de Conhecimento: D (direto, focado em resultado), I (influente, otimista), S (estável, paciente), C (cauteloso, preciso).
+Sua resposta DEVE ser um objeto JSON válido, sem texto ou formatação como ```json``` antes ou depois.
+"""
+
+# --- Função Auxiliar para Chamar a API ---
+def call_gemini(prompt):
+    if not GEMINI_API_KEY:
+        raise ValueError("A chave da API do Gemini não foi configurada.")
+    
+    model = genai.GenerativeModel('gemini-1.5-flash')
+    response = model.generate_content(prompt)
+    return response.text
+
+# --- Rota Principal: Servir a Página HTML ---
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+# --- Rota para a Análise Inicial ---
+@app.route('/analise-inicial', methods=['POST'])
+def handle_initial_analysis():
+    data = request.json
+    scores = data.get('scores')
+
+    prompt = f"""
+    {PROMPT_BASE}
+    Objetivo: Gerar uma análise DISC inicial e os pontos fortes.
+    Estrutura JSON Obrigatória:
+    {{
+      "analise_fator_a_fator": [{{"fator": "Dominância (D)", "cor": "var(--color-d)", "pontuacao": {scores['d']}, "analise": "..."}}],
+      "interacao_dos_fatores": "...",
+      "pontos_fortes": [{{"titulo": "Competitividade", "descricao": "..."}}],
+      "alerta_obrigatorio": "Inclua o parágrafo completo sobre a natureza situacional da análise."
+    }}
+    Analise o perfil com as pontuações: D={scores['d']}, I={scores['i']}, S={scores['s']}, C={scores['c']}.
+    """
+    try:
+        api_response = call_gemini(prompt)
+        return api_response
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# --- Rota para Pontos de Melhoria ---
+@app.route('/pontos-melhoria', methods=['POST'])
+def handle_improvement_points():
+    data = request.json
+    context = data.get('context')
+
+    prompt = f"""
+    {PROMPT_BASE}
+    Objetivo: Sugerir pontos de melhoria com base na análise DISC fornecida.
+    Estrutura JSON Obrigatória:
+    {{
+      "aviso_obrigatorio": "Estas sugestões são pontos de partida para o desenvolvimento pessoal, baseadas em tendências gerais do perfil.",
+      "pontos_fortes": [{{"ponto": "Nome do Ponto Forte", "desafio_potencial": "...", "sugestao": "..."}}],
+      "pontos_a_desenvolver": [{{"ponto": "Nome do Ponto a Desenvolver", "desafio_potencial": "...", "sugestao": "..."}}]
+    }}
+    Análise de Contexto: {context}
+    """
+    try:
+        api_response = call_gemini(prompt)
+        return api_response
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# --- Rota para Sugestões de Profissões ---
+@app.route('/sugestao-profissoes', methods=['POST'])
+def handle_career_suggestions():
+    data = request.json
+    context = data.get('context')
+
+    prompt = f"""
+    {PROMPT_BASE}
+    Objetivo: Sugerir profissões com base na análise DISC fornecida.
+    Estrutura JSON Obrigatória:
+    {{
+      "aviso_obrigatorio": "Estas sugestões de carreira são baseadas unicamente em tendências comportamentais. A escolha de carreira envolve muitos outros fatores.",
+      "profissoes_sugeridas": [{{"area": "Nome da Área", "justificativa": "...", "exemplos": "Cargo 1, Cargo 2"}}]
+    }}
+    Análise de Contexto: {context}
+    """
+    try:
+        api_response = call_gemini(prompt)
+        return api_response
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
