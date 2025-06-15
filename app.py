@@ -2,17 +2,18 @@ import os
 from flask import Flask, render_template, request, jsonify
 from dotenv import load_dotenv
 import google.generativeai as genai
+from whitenoise import WhiteNoise # Importar o Whitenoise
 
 # Carrega as variáveis de ambiente do ficheiro .env
 load_dotenv()
 
-# --- CORREÇÃO: Define o caminho base do projeto ---
-basedir = os.path.abspath(os.path.dirname(__file__))
+# --- Configuração do Flask ---
+app = Flask(__name__)
 
-# --- CORREÇÃO: Inicia o Flask com caminhos absolutos para as pastas ---
-app = Flask(__name__, 
-            static_folder=os.path.join(basedir, 'static'),
-            template_folder=os.path.join(basedir, 'templates'))
+# --- CORREÇÃO: Configurar o Whitenoise para servir a pasta 'static' ---
+# Isto garante que o CSS e o JS sejam sempre encontrados.
+app.wsgi_app = WhiteNoise(app.wsgi_app, root="static/")
+
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
