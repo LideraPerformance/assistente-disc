@@ -6,9 +6,14 @@ import google.generativeai as genai
 # Carrega as variáveis de ambiente do ficheiro .env
 load_dotenv()
 
-# --- Configuração do Flask e da API ---
-# Os caminhos agora são diretos, pois app.py está na raiz.
-app = Flask(__name__, template_folder='templates', static_folder='static')
+# --- CORREÇÃO: Define o caminho base do projeto ---
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+# --- CORREÇÃO: Inicia o Flask com caminhos absolutos para as pastas ---
+app = Flask(__name__, 
+            static_folder=os.path.join(basedir, 'static'),
+            template_folder=os.path.join(basedir, 'templates'))
+
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 # Verifica se a chave da API foi carregada antes de configurar
