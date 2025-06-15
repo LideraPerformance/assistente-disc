@@ -3,13 +3,20 @@ from flask import Flask, render_template, request, jsonify
 from dotenv import load_dotenv
 import google.generativeai as genai
 
-# Carrega as variáveis de ambiente do arquivo .env
+# Carrega as variáveis de ambiente do ficheiro .env
 load_dotenv()
 
 # --- Configuração do Flask e da API ---
-app = Flask(__name__, template_folder='../templates', static_folder='../static')
+# Os caminhos agora são diretos, pois app.py está na raiz.
+app = Flask(__name__, template_folder='templates', static_folder='static')
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-genai.configure(api_key=GEMINI_API_KEY)
+
+# Verifica se a chave da API foi carregada antes de configurar
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
+else:
+    print("Atenção: GEMINI_API_KEY não encontrada. As chamadas à API irão falhar.")
+
 
 # --- Constante com o Prompt Base ---
 PROMPT_BASE = """
@@ -21,7 +28,7 @@ Sua resposta DEVE ser um objeto JSON válido, sem texto ou formatação como ```
 # --- Função Auxiliar para Chamar a API ---
 def call_gemini(prompt):
     if not GEMINI_API_KEY:
-        raise ValueError("A chave da API do Gemini não foi configurada.")
+        raise ValueError("A chave da API do Gemini não foi configurada no ambiente.")
     
     model = genai.GenerativeModel('gemini-1.5-flash')
     response = model.generate_content(prompt)
@@ -100,4 +107,3 @@ def handle_career_suggestions():
         return api_response
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
