@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const errorDiv = document.getElementById('error-message');
     const outputDiv = document.getElementById('analysis-output');
     const submitButton = document.getElementById('submit-button');
-    let initialAnalysisContext = null; // Armazena o resultado inicial
+    let initialAnalysisContext = null;
 
     // --- Lógica de UI ---
     for (const key in sliders) {
@@ -45,8 +45,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify(body),
             });
             if (!response.ok) {
-                const err = await response.json();
-                throw new Error(err.error || "Ocorreu um erro no servidor.");
+                const errData = await response.json();
+                throw new Error(errData.error || "Ocorreu um erro desconhecido no servidor.");
             }
             return await response.json();
         } catch (error) {
@@ -69,10 +69,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const data = await fetchAnalysis('/analise-inicial', { scores });
-            initialAnalysisContext = data; // Salva o contexto para chamadas futuras
+            initialAnalysisContext = data;
             displayInitialAnalysis(data);
         } catch (error) {
-            // O erro já foi exibido pela função fetchAnalysis
+            // O erro já foi tratado
         } finally {
             finalizeUI();
         }
@@ -87,9 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
         fatorHtml += `</div></div>`;
 
         const interacaoHtml = `<div class="card"><h3 class="text-xl md:text-2xl font-bold mb-4 text-slate-700">Interação dos Fatores</h3><p class="text-slate-600 leading-relaxed">${data.interacao_dos_fatores}</p></div>`;
-
         const pontosFortesHtml = `<div class="card"><h3 class="text-xl md:text-2xl font-bold mb-4 text-slate-700">Pontos Fortes</h3><div class="space-y-4">${data.pontos_fortes.map(p => `<div class="p-4 bg-gray-50 rounded-lg border border-gray-200"><strong class="text-slate-800">${p.titulo}</strong><p class="text-sm text-slate-600 mt-1">${p.descricao}</p></div>`).join('')}</div></div>`;
-        
         const alertaHtml = `<div class="bg-blue-100 border border-blue-200 text-blue-800 p-4 rounded-xl text-sm" role="alert"><p class="font-bold">Aviso Importante</p><p>${data.alerta_obrigatorio}</p></div>`;
         
         const interactiveSectionHTML = `

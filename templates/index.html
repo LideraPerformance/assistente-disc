@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- CORREÇÃO: Voltando a usar url_for para robustez -->
+    <!-- Usando url_for para o Flask encontrar o ficheiro CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body class="text-gray-800">
@@ -20,7 +20,6 @@
             <p class="text-base md:text-lg text-slate-600 mt-2">Análise Interativa de Perfil DISC</p>
         </header>
 
-        <!-- O resto do seu HTML continua idêntico... -->
         <div class="card mb-12">
              <div class="space-y-6">
                 <div class="flex items-start gap-4">
@@ -98,7 +97,7 @@
         </div>
     </div>
 
-    <!-- CORREÇÃO: Voltando a usar url_for para robustez -->
+    <!-- Usando url_for para o Flask encontrar o ficheiro JavaScript -->
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
