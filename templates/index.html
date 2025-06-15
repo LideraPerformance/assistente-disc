@@ -8,7 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- CORREÇÃO: Usando caminho direto para o CSS -->
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body class="text-gray-800">
 
@@ -50,7 +51,6 @@
         <div class="card mb-8">
             <h2 class="text-xl md:text-2xl font-bold mb-8 text-center text-slate-700">Insira suas Pontuações</h2>
             <form id="disc-form" class="space-y-8">
-                <!-- Inputs serão renderizados aqui, idênticos ao protótipo -->
                  <div>
                     <div class="flex justify-between items-center mb-3">
                         <label for="d-slider" class="font-bold text-lg" style="color: var(--color-d);">Dominância (D)</label>
@@ -94,12 +94,10 @@
             </div>
             <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl" role="alert"></div>
             <div id="analysis-output" class="space-y-8"></div>
-            <div id="interactive-section" class="hidden space-y-6">
-                <!-- Seção interativa será renderizada aqui -->
-            </div>
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <!-- CORREÇÃO: Usando caminho direto para o JavaScript -->
+    <script src="/static/script.js"></script>
 </body>
 </html>
