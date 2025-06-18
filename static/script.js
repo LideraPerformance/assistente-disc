@@ -113,6 +113,14 @@ document.addEventListener('DOMContentLoaded', () => {
         outputDiv.innerHTML = fatorHtml + interacaoHtml + pontosFortesHtml + alertaHtml;
         resultsSection.insertAdjacentHTML('beforeend', interactiveSectionHTML);
         addInteractiveListeners();
+        
+        // Scroll automático para a seção de resultados
+        setTimeout(() => {
+            resultsSection.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+            });
+        }, 100);
     }
     
     function addInteractiveListeners() {
