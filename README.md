@@ -1,2 +1,0 @@
-# assistente-disc
-# assistente-disc
