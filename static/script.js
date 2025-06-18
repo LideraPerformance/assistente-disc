@@ -1,153 +1,115 @@
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Elementos do DOM
-    const sliders = {
-        d: document.getElementById('d-slider'),
-        i: document.getElementById('i-slider'),
-        s: document.getElementById('s-slider'),
-        c: document.getElementById('c-slider')
-    };
-    
-    const values = {
-        d: document.getElementById('d-value'),
-        i: document.getElementById('i-value'),
-        s: document.getElementById('s-value'),
-        c: document.getElementById('c-value')
-    };
-    
+document.addEventListener('DOMContentLoaded', () => {
+    // --- Seletores do DOM ---
     const form = document.getElementById('disc-form');
+    const sliders = { D: document.getElementById('d-slider'), I: document.getElementById('i-slider'), S: document.getElementById('s-slider'), C: document.getElementById('c-slider') };
+    const values = { D: document.getElementById('d-value'), I: document.getElementById('i-value'), S: document.getElementById('s-value'), C: document.getElementById('c-value') };
     const resultsSection = document.getElementById('results-section');
-    const loading = document.getElementById('loading');
-    const errorMessage = document.getElementById('error-message');
+    const loadingDiv = document.getElementById('loading');
+    const errorDiv = document.getElementById('error-message');
     const outputDiv = document.getElementById('analysis-output');
-    
-    // Atualizar valores dos sliders
-    Object.keys(sliders).forEach(key => {
-        sliders[key].addEventListener('input', function() {
-            values[key].textContent = parseFloat(this.value).toFixed(1);
+    const submitButton = document.getElementById('submit-button');
+    let initialAnalysisContext = null;
+
+    // --- Lógica de UI ---
+    for (const key in sliders) {
+        sliders[key].addEventListener('input', (event) => {
+            values[key].textContent = parseFloat(event.target.value).toFixed(1);
         });
-    });
-    
-    // Submissão do formulário
-    form.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const data = {
-            d: parseFloat(sliders.d.value),
-            i: parseFloat(sliders.i.value),
-            s: parseFloat(sliders.s.value),
-            c: parseFloat(sliders.c.value)
-        };
-        
-        // Mostrar loading
+    }
+
+    const resetUI = () => {
         resultsSection.classList.remove('hidden');
-        loading.classList.remove('hidden');
-        loading.classList.add('flex');
-        errorMessage.classList.add('hidden');
+        loadingDiv.classList.remove('hidden');
+        loadingDiv.classList.add('flex');
+        errorDiv.classList.add('hidden');
         outputDiv.innerHTML = '';
-        
+        const interactiveSection = document.getElementById('interactive-section');
+        if(interactiveSection) interactiveSection.remove();
+        submitButton.disabled = true;
+        submitButton.textContent = 'Analisando...';
+    };
+
+    const finalizeUI = () => {
+        loadingDiv.classList.add('hidden');
+        loadingDiv.classList.remove('flex');
+        submitButton.disabled = false;
+        submitButton.textContent = 'Gerar Análise';
+    }
+
+    // --- Lógica de Chamada ao Backend ---
+    async function fetchAnalysis(endpoint, body) {
         try {
-            const response = await fetch('/analyze', {
+            const response = await fetch(endpoint, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body),
             });
-            
             if (!response.ok) {
-                throw new Error('Erro ao processar análise');
+                const errData = await response.json();
+                throw new Error(errData.error || "Ocorreu um erro desconhecido no servidor.");
             }
-            
-            const result = await response.json();
-            displayResults(result);
-            
+            return await response.json();
         } catch (error) {
-            errorMessage.textContent = 'Erro ao gerar análise. Tente novamente.';
-            errorMessage.classList.remove('hidden');
+            console.error('Fetch error:', error);
+            errorDiv.textContent = error.message;
+            errorDiv.classList.remove('hidden');
+            throw error;
+        }
+    }
+    
+    // --- Manipulador do Formulário Principal ---
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        resetUI();
+
+        const scores = {
+            d: sliders.D.value, i: sliders.I.value,
+            s: sliders.S.value, c: sliders.C.value,
+        };
+
+        try {
+            const data = await fetchAnalysis('/analise-inicial', { scores });
+            initialAnalysisContext = data;
+            displayInitialAnalysis(data);
+        } catch (error) {
+            // O erro já foi tratado
         } finally {
-            loading.classList.add('hidden');
-            loading.classList.remove('flex');
+            finalizeUI();
         }
     });
     
-    function displayResults(data) {
-        // HTML para análise fator a fator
-        const fatorHtml = `
-            <div class="card">
-                <h2 class="text-2xl font-bold mb-6 text-slate-700 text-center">📊 Análise Fator a Fator</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-red-50 p-4 rounded-xl border-l-4 border-red-500">
-                        <h3 class="font-bold text-red-700 mb-2">🎯 Dominância (D): ${data.scores.d}</h3>
-                        <p class="text-sm text-red-600">${data.analysis.d}</p>
-                    </div>
-                    <div class="bg-yellow-50 p-4 rounded-xl border-l-4 border-yellow-500">
-                        <h3 class="font-bold text-yellow-700 mb-2">⭐ Influência (I): ${data.scores.i}</h3>
-                        <p class="text-sm text-yellow-600">${data.analysis.i}</p>
-                    </div>
-                    <div class="bg-green-50 p-4 rounded-xl border-l-4 border-green-500">
-                        <h3 class="font-bold text-green-700 mb-2">🤝 Estabilidade (S): ${data.scores.s}</h3>
-                        <p class="text-sm text-green-600">${data.analysis.s}</p>
-                    </div>
-                    <div class="bg-blue-50 p-4 rounded-xl border-l-4 border-blue-500">
-                        <h3 class="font-bold text-blue-700 mb-2">📋 Conformidade (C): ${data.scores.c}</h3>
-                        <p class="text-sm text-blue-600">${data.analysis.c}</p>
-                    </div>
-                </div>
-            </div>
-        `;
+    // --- Funções de Renderização ---
+    function displayInitialAnalysis(data) {
+        let fatorHtml = `<div class="card"><h3 class="text-xl md:text-2xl font-bold mb-6 text-center text-slate-700">Análise Fator a Fator</h3><div class="grid grid-cols-1 sm:grid-cols-2 gap-6">`;
+        data.analise_fator_a_fator.forEach(item => {
+            fatorHtml += `<div class="bg-gray-50 p-4 rounded-xl border"><div class="flex items-center justify-between mb-2"><p class="font-bold text-lg" style="color: ${item.cor};">${item.fator}</p><p class="font-semibold text-sm text-white py-1 px-2.5 rounded-md" style="background-color: ${item.cor};">${item.pontuacao}</p></div><p class="text-slate-600 text-sm">${item.analise}</p></div>`;
+        });
+        fatorHtml += `</div></div>`;
+
+        const interacaoHtml = `<div class="card"><h3 class="text-xl md:text-2xl font-bold mb-4 text-slate-700">Interação dos Fatores</h3><p class="text-slate-600 leading-relaxed">${data.interacao_dos_fatores}</p></div>`;
+        const pontosFortesHtml = `<div class="card"><h3 class="text-xl md:text-2xl font-bold mb-4 text-slate-700">Pontos Fortes</h3><div class="space-y-4">${data.pontos_fortes.map(p => `<div class="p-4 bg-gray-50 rounded-lg border border-gray-200"><strong class="text-slate-800">${p.titulo}</strong><p class="text-sm text-slate-600 mt-1">${p.descricao}</p></div>`).join('')}</div></div>`;
+        const alertaHtml = `<div class="bg-blue-100 border border-blue-200 text-blue-800 p-4 rounded-xl text-sm" role="alert"><p class="font-bold">Aviso Importante</p><p>${data.alerta_obrigatorio}</p></div>`;
         
-        // HTML para interação entre fatores
-        const interacaoHtml = `
-            <div class="card">
-                <h2 class="text-2xl font-bold mb-6 text-slate-700 text-center">🔄 Interação Entre Fatores</h2>
-                <div class="bg-gradient-to-br from-slate-50 to-slate-100 p-6 rounded-xl">
-                    <p class="text-slate-700 leading-relaxed">${data.factor_interaction}</p>
-                </div>
-            </div>
-        `;
-        
-        // HTML para pontos fortes
-        const pontosFortesHtml = `
-            <div class="card">
-                <h2 class="text-2xl font-bold mb-6 text-slate-700 text-center">💪 Pontos Fortes Identificados</h2>
-                <div class="bg-gradient-to-br from-emerald-50 to-emerald-100 p-6 rounded-xl">
-                    <ul class="space-y-3">
-                        ${data.strengths.map(strength => `<li class="flex items-start gap-3"><span class="text-emerald-600 font-bold">✓</span><span class="text-slate-700">${strength}</span></li>`).join('')}
-                    </ul>
-                </div>
-            </div>
-        `;
-        
-        // HTML para alertas
-        const alertaHtml = `
-            <div class="card">
-                <h2 class="text-2xl font-bold mb-6 text-slate-700 text-center">⚠️ Pontos de Atenção</h2>
-                <div class="bg-gradient-to-br from-amber-50 to-amber-100 p-6 rounded-xl">
-                    <ul class="space-y-3">
-                        ${data.alerts.map(alert => `<li class="flex items-start gap-3"><span class="text-amber-600 font-bold">!</span><span class="text-slate-700">${alert}</span></li>`).join('')}
-                    </ul>
-                </div>
-            </div>
-        `;
-        
-        // HTML para seção interativa
         const interactiveSectionHTML = `
-            <div class="card">
-                <h2 class="text-2xl font-bold mb-6 text-slate-700 text-center">🎯 Análises Especializadas</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <button id="pontos-melhoria-btn" class="bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold py-4 px-6 rounded-xl hover:from-orange-600 hover:to-red-600 transition-all shadow-lg hover:shadow-xl">
-                        🎯 Pontos de Melhoria
-                    </button>
-                    <button id="sugestoes-profissoes-btn" class="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-4 px-6 rounded-xl hover:from-purple-600 hover:to-pink-600 transition-all shadow-lg hover:shadow-xl">
-                        💼 Sugestões de Profissões
-                    </button>
+            <div id="interactive-section" class="space-y-6">
+                <div class="card">
+                    <h3 class="text-xl md:text-2xl font-bold mb-6 text-center text-slate-700">Explore Mais</h3>
+                    <div class="flex flex-col md:flex-row gap-4 justify-center">
+                        <button data-action="melhoria" class="interactive-button bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                            Pontos de Melhoria
+                        </button>
+                        <button data-action="profissoes" class="interactive-button bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            Sugestões de Profissões
+                        </button>
+                    </div>
                 </div>
-                <div id="pontos-melhoria-container" class="hidden mt-6"></div>
-                <div id="sugestoes-profissoes-container" class="hidden mt-6"></div>
-            </div>
-        `;
-        
+                <div id="interactive-loading" class="hidden flex-col items-center justify-center p-4"><div class="spinner spinner-small"></div></div>
+                <div id="interactive-output-melhoria" class="hidden card"></div>
+                <div id="interactive-output-profissoes" class="hidden card"></div>
+            </div>`;
+
         outputDiv.innerHTML = fatorHtml + interacaoHtml + pontosFortesHtml + alertaHtml;
         resultsSection.insertAdjacentHTML('beforeend', interactiveSectionHTML);
         addInteractiveListeners();
@@ -162,76 +124,59 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function addInteractiveListeners() {
-        document.getElementById('pontos-melhoria-btn').addEventListener('click', async function() {
-            await loadInteractiveAnalysis('improvement_points', 'pontos-melhoria-container');
-        });
-        
-        document.getElementById('sugestoes-profissoes-btn').addEventListener('click', async function() {
-            await loadInteractiveAnalysis('career_suggestions', 'sugestoes-profissoes-container');
+        document.querySelectorAll('.interactive-button').forEach(button => {
+            button.addEventListener('click', async () => {
+                const action = button.dataset.action;
+                const endpoint = action === 'melhoria' ? '/pontos-melhoria' : '/sugestao-profissoes';
+                const outputContainer = document.getElementById(`interactive-output-${action}`);
+                
+                document.getElementById('interactive-output-melhoria').classList.add('hidden');
+                document.getElementById('interactive-output-profissoes').classList.add('hidden');
+                const interactiveLoading = document.getElementById('interactive-loading');
+                interactiveLoading.classList.remove('hidden');
+                interactiveLoading.classList.add('flex');
+
+                try {
+                    const data = await fetchAnalysis(endpoint, { context: initialAnalysisContext });
+                    displayInteractiveAnalysis(action, data, outputContainer);
+                } catch (error) {
+                    console.error("Erro ao buscar análise:", error);
+                } finally {
+                    interactiveLoading.classList.add('hidden');
+                    interactiveLoading.classList.remove('flex');
+                }
+            });
         });
     }
-    
-    async function loadInteractiveAnalysis(type, containerId) {
-        const container = document.getElementById(containerId);
-        const data = {
-            d: parseFloat(sliders.d.value),
-            i: parseFloat(sliders.i.value),
-            s: parseFloat(sliders.s.value),
-            c: parseFloat(sliders.c.value),
-            analysis_type: type
-        };
-        
-        container.innerHTML = '<div class="flex items-center justify-center p-8"><div class="spinner"></div><span class="ml-3 text-slate-600">Carregando...</span></div>';
-        container.classList.remove('hidden');
-        
-        try {
-            const response = await fetch('/interactive_analysis', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
+
+    function displayInteractiveAnalysis(action, data, container) {
+        let html = '';
+        if (action === 'melhoria') {
+            html = `<h4 class="text-xl font-bold mb-4 text-slate-700">Pontos de Melhoria</h4>`;
+             if(data.aviso_obrigatorio) {
+                html += `<div class="mb-6 bg-gray-100 p-4 rounded-lg" role="alert"><p class="font-bold text-slate-700">Atenção!</p><p class="text-sm text-slate-600 mt-1">${data.aviso_obrigatorio}</p></div>`;
+            }
+            html += `<h5 class="font-semibold mt-4 mb-2 text-green-700">Potencializando Pontos Fortes</h5><div class="space-y-4">`;
+            data.pontos_fortes.forEach(p => {
+                html += `<div class="p-4 bg-green-50 rounded-lg border border-green-200"><strong>${p.ponto}:</strong><p class="text-sm text-slate-600 mt-1"><strong>Desafio:</strong> ${p.desafio_potencial}</p><p class="text-sm text-slate-600 mt-1"><strong>Sugestão:</strong> ${p.sugestao}</p></div>`;
             });
-            
-            if (!response.ok) {
-                throw new Error('Erro ao processar análise');
+            html += `</div><h5 class="font-semibold mt-6 mb-2 text-amber-700">Desenvolvendo Novas Habilidades</h5><div class="space-y-4">`;
+            data.pontos_a_desenvolver.forEach(p => {
+                html += `<div class="p-4 bg-amber-50 rounded-lg border border-amber-200"><strong>${p.ponto}:</strong><p class="text-sm text-slate-600 mt-1"><strong>Desafio:</strong> ${p.desafio_potencial}</p><p class="text-sm text-slate-600 mt-1"><strong>Sugestão:</strong> ${p.sugestao}</p></div>`;
+            });
+            html += `</div>`;
+        } else if (action === 'profissoes') {
+            html = `<h4 class="text-xl font-bold mb-4 text-slate-700">Sugestões de Profissões</h4>`;
+             if(data.aviso_obrigatorio) {
+                html += `<div class="mb-6 bg-gray-100 p-4 rounded-lg" role="alert"><p class="font-bold text-slate-700">Atenção!</p><p class="text-sm text-slate-600 mt-1">${data.aviso_obrigatorio}</p></div>`;
             }
-            
-            const result = await response.json();
-            
-            let html = '';
-            if (type === 'improvement_points') {
-                html = `
-                    <div class="bg-gradient-to-br from-orange-50 to-red-50 p-6 rounded-xl border border-orange-200">
-                        <h3 class="text-xl font-bold text-orange-700 mb-4">🎯 Pontos de Melhoria</h3>
-                        <ul class="space-y-3">
-                            ${result.analysis.map(point => `<li class="flex items-start gap-3"><span class="text-orange-600 font-bold">→</span><span class="text-slate-700">${point}</span></li>`).join('')}
-                        </ul>
-                    </div>
-                `;
-            } else {
-                html = `
-                    <div class="bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-xl border border-purple-200">
-                        <h3 class="text-xl font-bold text-purple-700 mb-4">💼 Sugestões de Profissões</h3>
-                        <ul class="space-y-3">
-                            ${result.analysis.map(profession => `<li class="flex items-start gap-3"><span class="text-purple-600 font-bold">•</span><span class="text-slate-700">${profession}</span></li>`).join('')}
-                        </ul>
-                    </div>
-                `;
-            }
-            container.innerHTML = html;
-            container.classList.remove('hidden');
-            
-            // Scroll automático para o container da análise interativa
-            setTimeout(() => {
-                container.scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'start' 
-                });
-            }, 100);
-            
-        } catch (error) {
-            container.innerHTML = '<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl">Erro ao carregar análise. Tente novamente.</div>';
+            html += `<div class="space-y-4">`;
+            data.profissoes_sugeridas.forEach(p => {
+                html += `<div class="p-4 bg-purple-50 rounded-lg border border-purple-200"><strong>Área: ${p.area}</strong><p class="text-sm mt-1 text-slate-600">${p.justificativa}</p><p class="text-sm mt-2 font-semibold text-slate-700">Exemplos: <span class="font-normal">${p.exemplos}</span></p></div>`;
+            });
+            html += `</div>`;
         }
+        container.innerHTML = html;
+        container.classList.remove('hidden');
     }
 });
