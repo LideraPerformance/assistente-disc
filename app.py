@@ -54,12 +54,15 @@ def handle_initial_analysis():
     prompt = f"""
     {PROMPT_BASE}
     Objetivo: Gerar uma análise DISC inicial e os pontos fortes.
+
+    Instrução para "interacao_dos_fatores": Identifique o fator com a maior pontuação (D, I, S, ou C). Comece a sua análise com a frase "No momento, seu perfil de preferências comportamentais resulta em '[FATOR MAIS ALTO]'.". Depois, continue a explicar como os diferentes fatores interagem.
+
     Estrutura JSON Obrigatória:
     {{
       "analise_fator_a_fator": [{{"fator": "Dominância (D)", "cor": "var(--color-d)", "pontuacao": {scores['d']}, "analise": "..."}}],
-      "interacao_dos_fatores": "...",
+      "interacao_dos_fatores": "No momento, seu perfil de preferências comportamentais resulta em 'X'. [Sua análise contínua aqui...]",
       "pontos_fortes": [{{"titulo": "Competitividade", "descricao": "..."}}],
-      "alerta_obrigatorio": "Inclua o parágrafo completo sobre a natureza situacional da análise."
+      "alerta_obrigatorio": "Inclua exatamente esse parágrafo: É importante lembrar que uma análise DISC é situacional e muda ao longo do tempo. Nesta análise foi considerado como o <b>Perfil Natural</b>, ou seja, sem esforços de adaptação. Ele tende a representar variações em outros ambientes, de acordo com as circunstâncias, o contexto e as pessoas envolvidas, o que chamamos de <b>Perfil Adaptado</b>.  Para uma compreensão mais ampla e aprofundada, recomenda-se uma avaliação DISC completa com dois questionários e a inclusão de outras avaliação no processo de autoconhecimento e autoconsciência para o desenvolvimento, bem como, para a eficiência de processos de recrutamento e seleção."
     }}
     Analise o perfil com as pontuações: D={scores['d']}, I={scores['i']}, S={scores['s']}, C={scores['c']}.
     """

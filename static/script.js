@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const data = await fetchAnalysis(endpoint, { context: initialAnalysisContext });
                     displayInteractiveAnalysis(action, data, outputContainer);
                 } catch (error) {
-                    // erro já tratado
+                    console.error("Erro ao buscar análise:", error);
                 } finally {
                     interactiveLoading.classList.add('hidden');
                     interactiveLoading.classList.remove('flex');
