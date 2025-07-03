@@ -111,6 +111,8 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
 
         outputDiv.innerHTML = fatorHtml + interacaoHtml + pontosFortesHtml + alertaHtml;
+        document.getElementById('cta-adicional').style.display = 'block';
+        document.getElementById('cta-adicional').classList.remove('hidden');
         resultsSection.insertAdjacentHTML('beforeend', interactiveSectionHTML);
         addInteractiveListeners();
         
