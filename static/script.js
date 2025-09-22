@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
             data.pontos_fortes.forEach(p => {
                 html += `<div class="p-4 bg-green-50 rounded-lg border border-green-200"><strong>${p.ponto}:</strong><p class="text-sm text-slate-600 mt-1"><strong>Desafio:</strong> ${p.desafio_potencial}</p><p class="text-sm text-slate-600 mt-1"><strong>Sugestão:</strong> ${p.sugestao}</p></div>`;
             });
-            html += `</div><h5 class="font-semibold mt-6 mb-2 text-amber-700">Desenvolvendo Novas Habilidades</h5><div class="space-y-4">`;
+            html += `</div><h5 class="font-semibold mt-6 mb-2 text-amber-700">Potencias Oportunidades de Melhoria</h5><div class="space-y-4">`;
             data.pontos_a_desenvolver.forEach(p => {
                 html += `<div class="p-4 bg-amber-50 rounded-lg border border-amber-200"><strong>${p.ponto}:</strong><p class="text-sm text-slate-600 mt-1"><strong>Desafio:</strong> ${p.desafio_potencial}</p><p class="text-sm text-slate-600 mt-1"><strong>Sugestão:</strong> ${p.sugestao}</p></div>`;
             });
