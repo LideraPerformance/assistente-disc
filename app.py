@@ -81,7 +81,7 @@ def handle_improvement_points():
 
     prompt = f"""
     {PROMPT_BASE}
-    Objetivo: Sugerir pontos de melhoria com base na análise DISC fornecida.
+    Objetivo: Sugerir pontos de atenção com base na análise DISC fornecida.
     Estrutura JSON Obrigatória:
     {{
       "aviso_obrigatorio": "Estas sugestões são pontos de partida para o desenvolvimento pessoal, baseadas em tendências gerais do perfil.",
