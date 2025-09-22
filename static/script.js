@@ -121,6 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 block: 'start' 
             });
         }, 100);
+        document.getElementById('cta-adicional').classList.remove('hidden');
     }
     
     function addInteractiveListeners() {
