@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="flex flex-col md:flex-row gap-4 justify-center">
                         <button data-action="melhoria" class="interactive-button bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                            Pontos de Melhoria
+                            Pontos de Atenção
                         </button>
                         <button data-action="profissoes" class="interactive-button bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function displayInteractiveAnalysis(action, data, container) {
         let html = '';
         if (action === 'melhoria') {
-            html = `<h4 class="text-xl font-bold mb-4 text-slate-700">Pontos de Melhoria</h4>`;
+            html = `<h4 class="text-xl font-bold mb-4 text-slate-700">Pontos de Atenção</h4>`;
              if(data.aviso_obrigatorio) {
                 html += `<div class="mb-6 bg-gray-100 p-4 rounded-lg" role="alert"><p class="font-bold text-slate-700">Atenção!</p><p class="text-sm text-slate-600 mt-1">${data.aviso_obrigatorio}</p></div>`;
             }
