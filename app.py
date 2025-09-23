@@ -3,7 +3,8 @@ from flask import Flask, render_template, request, jsonify
 from dotenv import load_dotenv
 import google.generativeai as genai
 from google.api_core import exceptions
-from whitenoise import WhiteNoise # Importar o Whitenoise
+from whitenoise import WhiteNoise
+import json
 
 # Carrega as variáveis de ambiente do ficheiro .env
 load_dotenv()
@@ -39,7 +40,12 @@ def call_gemini(prompt):
     
     model = genai.GenerativeModel('gemini-1.5-flash')
     response = model.generate_content(prompt)
-    return response.text
+    try:
+        # Limpa e carrega a resposta como JSON
+        clean_json_str = response.text.strip().replace('```json', '').replace('```', '')
+        return json.loads(clean_json_str)
+    except json.JSONDecodeError as e:
+        raise ValueError(f"A resposta da API Gemini não é um JSON válido: {response.text}") from e
 
 # --- Rota Principal: Servir a Página HTML ---
 @app.route('/')
@@ -69,9 +75,23 @@ def handle_initial_analysis():
     """
     try:
         api_response = call_gemini(prompt)
-        return api_response
+        return jsonify(api_response)
+    except exceptions.ResourceExhausted as e:
+        print(f"Erro de limite de requisições (429) da API Gemini: {e}")
+        mensagem_amigavel = "Você atingiu o limite de análises por um período. Por favor, aguarde um momento antes de tentar novamente."
+        return jsonify({"error": mensagem_amigavel}), 429
+    except exceptions.ServiceUnavailable as e:
+        print(f"Erro de serviço (503) da API Gemini: {e}")
+        mensagem_amigavel = "Nosso assistente de IA está com alta demanda no momento. Por favor, tente novamente em alguns instantes."
+        return jsonify({"error": mensagem_amigavel}), 503
+    except ValueError as e:
+        print(f"Erro de valor (JSON inválido): {e}")
+        mensagem_amigavel = "Houve um problema ao processar a resposta da análise. Nossa equipe já foi notificada."
+        return jsonify({"error": mensagem_amigavel}), 500
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        print(f"Erro inesperado: {e}")
+        mensagem_amigavel = "Um imprevisto impediu a geração da sua análise. Por favor, tente novamente mais tarde."
+        return jsonify({"error": mensagem_amigavel}), 500
 
 # --- Rota para Pontos de Melhoria ---
 @app.route('/pontos-melhoria', methods=['POST'])
@@ -92,9 +112,23 @@ def handle_improvement_points():
     """
     try:
         api_response = call_gemini(prompt)
-        return api_response
+        return jsonify(api_response)
+    except exceptions.ResourceExhausted as e:
+        print(f"Erro de limite de requisições (429) da API Gemini: {e}")
+        mensagem_amigavel = "Você atingiu o limite de análises por um período. Por favor, aguarde um momento antes de tentar novamente."
+        return jsonify({"error": mensagem_amigavel}), 429
+    except exceptions.ServiceUnavailable as e:
+        print(f"Erro de serviço (503) da API Gemini: {e}")
+        mensagem_amigavel = "Nosso assistente de IA está com alta demanda no momento. Por favor, tente novamente em alguns instantes."
+        return jsonify({"error": mensagem_amigavel}), 503
+    except ValueError as e:
+        print(f"Erro de valor (JSON inválido): {e}")
+        mensagem_amigavel = "Houve um problema ao processar a resposta da análise. Nossa equipe já foi notificada."
+        return jsonify({"error": mensagem_amigavel}), 500
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        print(f"Erro inesperado: {e}")
+        mensagem_amigavel = "Um imprevisto impediu a geração da sua análise. Por favor, tente novamente mais tarde."
+        return jsonify({"error": mensagem_amigavel}), 500
 
 # --- Rota para Sugestões de Profissões ---
 @app.route('/sugestao-profissoes', methods=['POST'])
@@ -114,7 +148,7 @@ def handle_career_suggestions():
     """
     try:
         api_response = call_gemini(prompt)
-        return api_response
+        return jsonify(api_response)
     except exceptions.ResourceExhausted as e:
         print(f"Erro de limite de requisições (429) da API Gemini: {e}")
         mensagem_amigavel = "Você atingiu o limite de análises por um período. Por favor, aguarde um momento antes de tentar novamente."
