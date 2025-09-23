@@ -107,7 +107,7 @@ def handle_career_suggestions():
     Objetivo: Sugerir profissões com base na análise DISC fornecida.
     Estrutura JSON Obrigatória:
     {{
-      "aviso_obrigatorio": "Estas sugestões de carreira são baseadas unicamente em tendências comportamentais. A escolha de carreira envolve muitos outros fatores.",
+      "aviso_obrigatorio": "Estas sugestões de carreira são baseadas unicamente nas informações de preferências comportamentais informadas. É importantes ressaltar que a escolha de carreira envolve muitos outros fatores, tais como: Motivadores, Competências, Inteligências, entre outros.",
       "profissoes_sugeridas": [{{"area": "Nome da Área", "justificativa": "...", "exemplos": "Cargo 1, Cargo 2"}}]
     }}
     Análise de Contexto: {context}
