@@ -38,7 +38,7 @@ def call_gemini(prompt):
     if not GEMINI_API_KEY:
         raise ValueError("A chave da API do Gemini não foi configurada no ambiente.")
     
-    model = genai.GenerativeModel('gemini-2.5-flash-lite')
+    model = genai.GenerativeModel('gemini-2.0-flash-lite')
     response = model.generate_content(prompt)
     try:
         # Limpa e carrega a resposta como JSON
